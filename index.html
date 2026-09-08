@@ -12,16 +12,16 @@
   <body>
     <main class="app-shell">
       <header class="hero">
-        <p class="eyebrow">A lyric-inspired brain game</p>
+        <p class="eyebrow">A diva-worthy brain game</p>
         <h1>Celine’s <em>Sudoku</em></h1>
-        <p class="intro">Find the highlighted number, unlock a song question, and complete all ten rounds.</p>
+        <p class="intro">Take the spotlight, follow the clues, and let every confident move lead you closer to an encore.</p>
       </header>
 
       <section class="game-card" aria-label="Celine Dion lyric sudoku game">
         <div class="game-topline">
           <div>
-            <p class="label">Round <span id="round">1</span> of 10</p>
-            <h2 id="prompt">Find the glowing square</h2>
+            <p class="label">Lyric challenge <span id="round">0</span> of 10</p>
+            <h2 id="prompt">Choose a square, then place your number</h2>
           </div>
           <div class="score-chip" aria-label="Correct answers"><span id="score">0</span><small>correct</small></div>
         </div>
@@ -32,12 +32,12 @@
           <div id="board" class="sudoku-board" aria-label="Sudoku board"></div>
           <aside class="how-to">
             <span class="spark">✦</span>
-            <p><strong>How to play</strong><br />Tap a number, then place it in the glowing square. A lyric challenge unlocks each successful move.</p>
+            <p><strong>Take the stage</strong><br />Select any open square, then choose a number. Every five great moves unlocks a lyric challenge.</p>
           </aside>
         </div>
 
         <div class="number-row" id="number-pad" aria-label="Choose a number"></div>
-        <p class="feedback" id="feedback" aria-live="polite">Choose a number to begin.</p>
+        <p class="feedback" id="feedback" aria-live="polite">Select an open square to begin.</p>
       </section>
       <p class="footer-note">Inspired by Celine Dion’s iconic songs · No lyric memorisation needed.</p>
     </main>
