@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>The Celine Dion Lyric Grid</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="hero">
+        <p class="eyebrow">A lyric-inspired brain game</p>
+        <h1>Celine’s <em>Sudoku</em></h1>
+        <p class="intro">Find the highlighted number, unlock a song question, and complete all ten rounds.</p>
+      </header>
+
+      <section class="game-card" aria-label="Celine Dion lyric sudoku game">
+        <div class="game-topline">
+          <div>
+            <p class="label">Round <span id="round">1</span> of 10</p>
+            <h2 id="prompt">Find the glowing square</h2>
+          </div>
+          <div class="score-chip" aria-label="Correct answers"><span id="score">0</span><small>correct</small></div>
+        </div>
+
+        <div class="progress-track" aria-hidden="true"><span id="progress"></span></div>
+
+        <div class="board-wrap">
+          <div id="board" class="sudoku-board" aria-label="Sudoku board"></div>
+          <aside class="how-to">
+            <span class="spark">✦</span>
+            <p><strong>How to play</strong><br />Tap a number, then place it in the glowing square. A lyric challenge unlocks each successful move.</p>
+          </aside>
+        </div>
+
+        <div class="number-row" id="number-pad" aria-label="Choose a number"></div>
+        <p class="feedback" id="feedback" aria-live="polite">Choose a number to begin.</p>
+      </section>
+      <p class="footer-note">Inspired by Celine Dion’s iconic songs · No lyric memorisation needed.</p>
+    </main>
+
+    <div id="quiz-modal" class="modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="question-title">
+      <div class="modal-card">
+        <p class="eyebrow">Lyric challenge</p>
+        <h2 id="question-title">Your question</h2>
+        <div id="answers" class="answers"></div>
+        <p id="quiz-feedback" class="quiz-feedback" aria-live="polite"></p>
+      </div>
+    </div>
+
+    <section id="finish-screen" class="finish-screen" hidden aria-live="polite">
+      <div class="finish-card">
+        <span class="spark big-spark">✦</span>
+        <p class="eyebrow">Game complete</p>
+        <h2>Your final score</h2>
+        <p class="final-score"><span id="final-score">0</span><small>/10</small></p>
+        <p id="result-message" class="result-message"></p>
+        <button id="play-again" class="primary-button">Play again</button>
+      </div>
+    </section>
+    <script src="script.js"></script>
+  </body>
+</html>
