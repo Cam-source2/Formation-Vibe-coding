@@ -21,40 +21,130 @@ const challenges = [
   ['Which song title directly expresses Celine’s belief in love’s ability to overcome obstacles?', ['Love Can Move Mountains', 'Flying on My Own', 'Water from the Moon'], 0]
 ];
 
-let selected = null, round = 0, score = 0, activeIndex = null, questionMissed = false, workingPuzzle = [...puzzle];
-const board = document.querySelector('#board'), pad = document.querySelector('#number-pad');
-const feedback = document.querySelector('#feedback'), modal = document.querySelector('#quiz-modal');
+let selectedNumber = null;
+let selectedCell = null;
+let correctMoves = 0;
+let challengeRound = 0;
+let score = 0;
+let questionMissed = false;
+const workingPuzzle = [...puzzle];
+const board = document.querySelector('#board');
+const pad = document.querySelector('#number-pad');
+const feedback = document.querySelector('#feedback');
+const modal = document.querySelector('#quiz-modal');
 
-function candidates() { return workingPuzzle.map((value, index) => value === 0 ? index : null).filter(Number.isInteger); }
-function setTarget() { const open = candidates(); activeIndex = open[Math.floor(Math.random() * open.length)]; renderBoard(); }
 function renderBoard() {
   board.innerHTML = '';
   workingPuzzle.forEach((value, index) => {
-    const cell = document.createElement('button'); cell.className = `cell ${puzzle[index] ? 'given' : ''} ${index === activeIndex ? 'target' : ''} ${value && !puzzle[index] ? 'solved' : ''}`;
-    cell.textContent = value || ''; cell.disabled = index !== activeIndex;
-    if (index === activeIndex) cell.addEventListener('click', tryPlacement); board.append(cell);
+    const cell = document.createElement('button');
+    const isGiven = Boolean(puzzle[index]);
+    const isOpen = value === 0;
+    cell.className = `cell ${isGiven ? 'given' : ''} ${isOpen ? 'open' : ''} ${value && !isGiven ? 'solved' : ''} ${index === selectedCell ? 'selected-cell' : ''}`;
+    cell.textContent = value || '';
+    cell.disabled = !isOpen;
+    if (isOpen) cell.addEventListener('click', () => selectCell(index));
+    board.append(cell);
   });
 }
-function renderPad() { pad.innerHTML = ''; for (let n=1;n<=9;n++) { const b=document.createElement('button'); b.className=`number ${selected===n?'selected':''}`; b.textContent=n; b.setAttribute('aria-label',`Number ${n}`); b.onclick=()=>{selected=n;renderPad();feedback.textContent='Now tap the glowing square.'}; pad.append(b); } }
+
+function renderPad() {
+  pad.innerHTML = '';
+  for (let number = 1; number <= 9; number++) {
+    const button = document.createElement('button');
+    button.className = `number ${selectedNumber === number ? 'selected' : ''}`;
+    button.textContent = number;
+    button.setAttribute('aria-label', `Number ${number}`);
+    button.addEventListener('click', () => selectNumber(number));
+    pad.append(button);
+  }
+}
+
+function selectCell(index) {
+  selectedCell = index;
+  renderBoard();
+  feedback.textContent = selectedNumber ? 'Now place your selected number.' : 'Square selected — choose a number.';
+}
+
+function selectNumber(number) {
+  selectedNumber = number;
+  renderPad();
+  if (selectedCell === null) {
+    feedback.textContent = 'Number selected — now choose an open square.';
+    return;
+  }
+  tryPlacement();
+}
+
 function tryPlacement() {
-  if (!selected) { feedback.textContent = 'Choose a number first.'; return; }
-  if (selected !== solution[activeIndex]) { feedback.textContent = 'Not quite — check the row, column, and square.'; board.children[activeIndex].classList.add('mistake'); return; }
-  feedback.textContent = 'Great move! Answer the lyric challenge.'; showChallenge();
+  if (selectedNumber !== solution[selectedCell]) {
+    feedback.textContent = 'Not quite — check the row, column, and square.';
+    board.children[selectedCell].classList.add('mistake');
+    return;
+  }
+
+  workingPuzzle[selectedCell] = selectedNumber;
+  correctMoves++;
+  selectedNumber = null;
+  selectedCell = null;
+  renderBoard();
+  renderPad();
+
+  if (correctMoves % 5 === 0 && challengeRound < challenges.length) {
+    feedback.textContent = 'Five beautiful moves! Your lyric challenge is ready.';
+    showChallenge();
+  } else {
+    feedback.textContent = 'Beautiful move — select another open square.';
+    update();
+  }
 }
+
 function showChallenge() {
-  const [question, choices, correct] = challenges[round]; document.querySelector('#question-title').textContent = question;
-  const answers = document.querySelector('#answers'), quizFeedback = document.querySelector('#quiz-feedback'); answers.innerHTML=''; quizFeedback.textContent=''; questionMissed = false;
-  choices.forEach((choice,index)=>{ const button=document.createElement('button'); button.className='answer'; button.textContent=choice; button.onclick=()=>answerQuestion(index,correct,button); answers.append(button); });
-  modal.setAttribute('aria-hidden','false');
+  const [question, choices, correct] = challenges[challengeRound];
+  document.querySelector('#question-title').textContent = question;
+  const answers = document.querySelector('#answers');
+  const quizFeedback = document.querySelector('#quiz-feedback');
+  answers.innerHTML = '';
+  quizFeedback.textContent = '';
+  questionMissed = false;
+  choices.forEach((choice, index) => {
+    const button = document.createElement('button');
+    button.className = 'answer';
+    button.textContent = choice;
+    button.addEventListener('click', () => answerQuestion(index, correct, button));
+    answers.append(button);
+  });
+  modal.setAttribute('aria-hidden', 'false');
 }
+
 function answerQuestion(answer, correct, button) {
   const buttons = [...document.querySelectorAll('.answer')];
-  if(answer !== correct) { questionMissed = true; button.classList.add('incorrect'); button.disabled = true; document.querySelector('#quiz-feedback').textContent='Not quite — try another answer to unlock the number.'; return; }
-  buttons.forEach(b=>b.disabled=true); if (!questionMissed) score++; button.classList.add('correct'); document.querySelector('#quiz-feedback').textContent='Correct! The number is now yours.';
-  setTimeout(()=>{ modal.setAttribute('aria-hidden','true'); workingPuzzle[activeIndex]=solution[activeIndex]; round++; selected=null; update(); }, 1150);
+  if (answer !== correct) {
+    questionMissed = true;
+    button.classList.add('incorrect');
+    button.disabled = true;
+    document.querySelector('#quiz-feedback').textContent = 'Not quite — try another answer to continue.';
+    return;
+  }
+  buttons.forEach((choice) => { choice.disabled = true; });
+  if (!questionMissed) score++;
+  button.classList.add('correct');
+  document.querySelector('#quiz-feedback').textContent = 'Correct! The spotlight is yours.';
+  setTimeout(() => {
+    modal.setAttribute('aria-hidden', 'true');
+    challengeRound++;
+    update();
+  }, 1150);
 }
+
 function update() {
-  document.querySelector('#score').textContent=score; document.querySelector('#round').textContent=Math.min(round+1,10); document.querySelector('#progress').style.width=`${round*10}%`;
-  if(round === 10) { renderBoard(); feedback.textContent=`All rounds complete — you answered ${score} lyric challenges correctly.`; return; } setTarget(); renderPad(); feedback.textContent='Choose a number to continue.';
+  document.querySelector('#score').textContent = score;
+  document.querySelector('#round').textContent = challengeRound;
+  document.querySelector('#progress').style.width = `${(correctMoves / (puzzle.filter((value) => value === 0).length)) * 100}%`;
+  if (!workingPuzzle.includes(0)) {
+    feedback.textContent = `Encore complete — you answered ${score} lyric challenges correctly.`;
+  }
 }
+
+renderBoard();
+renderPad();
 update();
