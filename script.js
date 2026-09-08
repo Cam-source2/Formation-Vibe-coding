@@ -55,8 +55,6 @@ function answerQuestion(answer, correct, button) {
 }
 function update() {
   document.querySelector('#score').textContent=score; document.querySelector('#round').textContent=Math.min(round+1,10); document.querySelector('#progress').style.width=`${round*10}%`;
-  if(round === 10) { renderBoard(); finish(); return; } setTarget(); renderPad(); feedback.textContent='Choose a number to continue.';
+  if(round === 10) { renderBoard(); feedback.textContent=`All rounds complete — you answered ${score} lyric challenges correctly.`; return; } setTarget(); renderPad(); feedback.textContent='Choose a number to continue.';
 }
-function finish() { document.querySelector('#final-score').textContent=score; document.querySelector('#result-message').textContent=score > 8 ? 'Skills validated ✦ You know your Celine classics!' : 'Lovely work! Play again to see if you can validate your skills.'; document.querySelector('#finish-screen').hidden=false; }
-document.querySelector('#play-again').onclick=()=>{ selected=null;round=0;score=0;activeIndex=null;questionMissed=false;workingPuzzle=[...puzzle];document.querySelector('#finish-screen').hidden=true;update(); };
 update();
